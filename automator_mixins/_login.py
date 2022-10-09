@@ -632,8 +632,9 @@ class LoginMixin(ToolsMixin):
 
     @DEBUG_RECORD
     def change_acc(self):  # 切换账号
-        self.get_zhuye().goto_zhucaidan().back_title().OK()
+        self.log.write_log("info", message=f'本来是切换账号{self.account}的入口，被我魔改辣--0x114514BB')
+        #self.get_zhuye().goto_zhucaidan().back_title().OK()
         # 设备匿名
-        self.phone_privacy()
+        #self.phone_privacy()
         # pcr_log(self.account).write_log(level='info', message='%s账号完成任务' % self.account)
         # pcr_log(self.account).server_bot("warning", "%s账号完成任务" % self.account)

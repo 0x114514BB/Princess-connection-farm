@@ -53,6 +53,24 @@ class DiaoChaXuanGuanBase(SevenBTNMixin):
                 self.fclick(1, 1)
             except LockMaxRetryError:
                 self.fclick(1, 1)
+    
+    def doit_new(self, team_order="zhanli", level="1,2", shengji=True):
+        ec = [(539, 146), (541, 255), (540, 355)]
+        # 圣迹3关，神殿两关
+        if shengji:
+            ec_l = [ ec[3-int(i)] for i in level.split(',')]
+        else:
+            ec_l = [ ec[2-int(i)] for i in level.split(',')]
+        for xx, yy in ec_l:
+            if not self._a.check_shuatu():
+                break
+            try:
+                DC: DiaoChaInfoBox = self.goto(DiaoChaInfoBox, gotofun=self.fun_click(xx, yy), use_in_feature_only=True,
+                                               retry=2, interval=2, before_clear=False)
+                DC.shua(team_order)
+                self.fclick(1, 1)
+            except LockMaxRetryError:
+                self.fclick(1, 1)
 
 
 class ShengJiDiaoCha(DiaoChaXuanGuanBase):

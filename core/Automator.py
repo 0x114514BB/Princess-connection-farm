@@ -172,7 +172,8 @@ class Automator(HanghuiMixin, LoginMixin, RoutineMixin, ShuatuMixin, JJCMixin, D
             try:
                 if before_:
                     self.task_current("登录")
-                    _return_code = self.login_auth(account, password)
+                    # _return_code = self.login_auth(account, password)
+                    _return_code = 0
                     if _return_code == -1:
                         # 标记错误！
                         self.task_error(str('%s账号出现了验证码' % self.account))
