@@ -2,8 +2,8 @@ import os
 
 from flask import Blueprint, jsonify, request
 
-from api.constants.reply import ListReply
-from core.usercentre import AutomatorRecorder, list_all_batches
+from api.constants.reply import Reply, ListReply
+from core.usercentre import AutomatorRecorder, list_all_batches, check_valid_batch
 
 batches_api = Blueprint('batches', __name__)
 
@@ -25,7 +25,7 @@ def get_batches_info(filename):
     try:
         r = AutomatorRecorder.getbatch(filename)
         if r:
-            return ListReply(r, 0)
+            return Reply(r)
         else:
             return 500
     except Exception as e:
@@ -35,18 +35,21 @@ def get_batches_info(filename):
 @batches_api.route('/batches_save', methods=['POST'])
 # 增 改
 def save_batches():
+    # {filename: A, content: B}
     # '{"batch": [{"group": "\u88c5\u5907\u519c\u573a","taskfile": "n11\u88c5\u5907\u519c\u573a","priority": 0}]}'
     try:
-        obj = request.json
-        BatchesFileName = request.json.get("filename")
-        obj.pop("filename")
-        save_dict = {"batch": [obj]}
-        if check_valid_batch(save_dict, is_raise=False):
-            AutomatorRecorder.setbatch(BatchName, save_dict)
-            old_batch = AutomatorRecorder.getbatch(BatchesFileName)
-            return jsonify({"code": 200, "msg": f"{old_batch}-保存成功"})
+        data = request.get_json()
+        if data is not None:
+            batch_file_name, batch_file_content = data.get("filename"), data.get("content")
+            save_dict = {"batch": batch_file_content}
+            if check_valid_batch(save_dict, is_raise=False):
+                AutomatorRecorder.setbatch(batch_file_name, save_dict)
+                old_batch = AutomatorRecorder.getbatch(batch_file_name)
+                return jsonify({"code": 200, "msg": f"{old_batch}-保存成功"})
+            else:
+                return jsonify({"code": 500, "msg": f"{save_dict}-保存失败"})
         else:
-            return jsonify({"code": 500, "msg": f"{save_dict}-保存失败"})
+            raise(ValueError("无JSON数据"))
     except Exception as e:
         return jsonify({"code": 500, "msg": f"{e}-保存失败"})
 

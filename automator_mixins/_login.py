@@ -68,24 +68,41 @@ class LoginMixin(ToolsMixin):
 
         # 结构梳理下为：auth -> login_auth(是否需要实名认证<->login<->do_login[验证码处理]) -> init_home(lock_home)
         for retry in range(300):
+            self.log.write_log('info', f"点击事件retry: {retry}")
             self._move_check()
             self.click(945, 13)  # 防止卡住
             if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_other").exists():
                 self.d(resourceId="com.bilibili.priconne:id/tv_gsc_other").click()
+                self.log.write_log('info', f"点击事件1")
                 time.sleep(0.8)
                 continue
             if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").exists():
                 self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").click()
+                self.log.write_log('info', f"点击事件2")
                 time.sleep(0.8)
                 continue
-            if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").exists():
-                self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").click()
+            # 到登录界面 点头像展开
+            
+            if self.d(resourceId="com.bilibili.priconne:id/iv_gsc_recode_head").exists():
+                self.d(resourceId="com.bilibili.priconne:id/iv_gsc_recode_head").click()
+                self.log.write_log('info', f"点击下拉框")
                 time.sleep(0.8)
-                continue
-            if self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").exists():
-                time.sleep(0.8)
-                self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").click()
-                continue
+                if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_item_name", text=pwd).exists():
+                    self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_item_name", text=pwd).click()
+                    self.log.write_log('info', f"成功切换账户{ac}，用户名{pwd}")
+                    time.sleep(0.4)
+                    break
+                else:
+                    self.log.write_log('info', f"未找到账户{ac}，用户名{pwd}")
+                    continue
+            # if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").exists():
+            #     self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").click()
+            #     time.sleep(0.8)
+            #     continue
+            # if self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").exists():
+            #     time.sleep(0.8)
+            #     self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").click()
+            #     continue
             if self.d(text="Geetest").exists() or self.d(description="Geetest").exists():
                 self.click(687, 72)
                 # 防止卡验证码
@@ -96,6 +113,21 @@ class LoginMixin(ToolsMixin):
                 break
         else:
             raise Exception("进入登陆页面失败！")
+
+        time.sleep(0.5) 
+        self.log.write_log('info', f"即将点击登录！")
+        self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login").click()
+        time.sleep(1.0)
+        '''
+        TODO: 根据名称切账户，账户名称用password表示
+        d(resourceId="com.bilibili.priconne:id/iv_gsc_recode_head") # 点击登录下拉框
+
+        d(resourceId="com.bilibili.priconne:id/tv_gsc_record_item_name", text="炸鱼810") # 点击登陆记录框
+        
+        
+        // 下面的部分都可以跳过了
+
+
         self.d(resourceId="com.bilibili.priconne:id/et_gsc_account").click()
         self.d.clear_text()
         self.d.send_keys(str(ac))
@@ -115,6 +147,7 @@ class LoginMixin(ToolsMixin):
             raise BadLoginException("密码不安全！")
         # else:
         #     print(f"toast_message:{toast_message}")
+        '''
 
         while True:
             # 快速响应
@@ -267,21 +300,21 @@ class LoginMixin(ToolsMixin):
                     self.d(text="登录").click(timeout=5)
                     return -1
 
-        # 下面代码暂时不管用
-        # if self.d(text="Geetest").exists() or self.d(description="Geetest").exists():
-        #     if _time >= 5:
-        #         print("重试次数太多啦，休息15s")
-        #         time.sleep(15)
-        #         _time = 0
-        #         AutoCaptcha()
-        #     # 如果次数大于两次，则申诉题目
-        #     elif _time > captcha_senderror_times and captcha_senderror:
-        #         print("—申诉题目:", _id)
-        #         cs.send_error(_id)
-        #     _time = + 1
-        #     print("验证码登陆验证重来！")
-        #     # 如果还有验证码就返回重试
-        #     AutoCaptcha()
+            # 下面代码暂时不管用
+            # if self.d(text="Geetest").exists() or self.d(description="Geetest").exists():
+            #     if _time >= 5:
+            #         print("重试次数太多啦，休息15s")
+            #         time.sleep(15)
+            #         _time = 0
+            #         AutoCaptcha()
+            #     # 如果次数大于两次，则申诉题目
+            #     elif _time > captcha_senderror_times and captcha_senderror:
+            #         print("—申诉题目:", _id)
+            #         cs.send_error(_id)
+            #     _time = + 1
+            #     print("验证码登陆验证重来！")
+            #     # 如果还有验证码就返回重试
+            #     AutoCaptcha()
 
         SkipAuth()
         SkipAD()
@@ -463,6 +496,7 @@ class LoginMixin(ToolsMixin):
             self.lock_no_img('img/ok.bmp', elseclick=[(591, 369)], at=(495, 353, 687, 388))
 
             try_count = 0
+            self.log.write_log("info", "进入login函数")
             while True:
                 self._move_check()
                 try_count += 1
@@ -491,25 +525,32 @@ class LoginMixin(ToolsMixin):
                 # if self.d(resourceId="com.bilibili.priconne:id/unitySurfaceView").exists():
                 #     self.d(resourceId="com.bilibili.priconne:id/unitySurfaceView").click()
 
+                # 看到切账号大头了就可以break了
+                if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").exists():
+                    self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").click()
+                    self.log.write_log("info", "测试点002")
+                    time.sleep(10)
+                    break
+                '''
                 if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_other").exists():
                     self.d(resourceId="com.bilibili.priconne:id/tv_gsc_other").click()
                     time.sleep(2)
-                    continue
-                if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").exists():
-                    self.d(resourceId="com.bilibili.priconne:id/tv_gsc_wel_change").click()
-                    time.sleep(2)
+                    self.log.write_log("info", "测试点001")
                     continue
                 if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").exists():
                     self.d(resourceId="com.bilibili.priconne:id/tv_gsc_record_login_change").click()
                     time.sleep(2)
+                    self.log.write_log("info", "测试点003")
                     continue
                 if self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").exists():
                     self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").click()
+                    self.log.write_log("info", "测试点004")
                     time.sleep(2)
                     continue
                 if self.d(resourceId="com.bilibili.priconne:id/et_gsc_account").exists():
                     self.d(resourceId="com.bilibili.priconne:id/et_gsc_account").click()
                     break
+                '''
                 if self.d(text="Geetest").exists() or self.d(description="Geetest").exists():
                     self.click(687, 72)
                     # 防止卡验证码
@@ -531,8 +572,10 @@ class LoginMixin(ToolsMixin):
                         self.d(description="同意").click()
                     # time.sleep(6)
                 else:
+                    # self.click(812, 345)  # 20230215新协议
                     self.click(560, 430)  # 原本是945 13
                     self.click(678, 377)  # 下载
+            self.log.write_log("info", "进入do_login")
             return self.do_login(ac, pwd)
         except Exception as e:
             # if error_flag:
@@ -660,8 +703,9 @@ class LoginMixin(ToolsMixin):
 
     @DEBUG_RECORD
     def change_acc(self):  # 切换账号
-        self.get_zhuye().goto_zhucaidan().back_title().OK()
+        self.log.write_log("info", message=f'本来是切换账号{self.account}的入口，被我魔改辣--0x114514BB')
+        #self.get_zhuye().goto_zhucaidan().back_title().OK()
         # 设备匿名
-        self.phone_privacy()
+        #self.phone_privacy()
         # pcr_log(self.account).write_log(level='info', message='%s账号完成任务' % self.account)
         # pcr_log(self.account).server_bot("warning", "%s账号完成任务" % self.account)

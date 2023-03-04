@@ -108,6 +108,24 @@ class BoolInputer(InputBoxBase):
             return f"应是str类型，而不是{type(str)}"
         return ""
 
+class EnumStrInputer(InputBoxBase):
+    def __init__(self, desc="", enum={}):
+        self.desc = desc
+        self.enum = enum
+
+    def create(self) -> str:
+        if self.desc != "":
+            print(self.desc)
+        a = input("请输入一个字符串 ")
+        return a
+
+    def check(self, obj):
+        if not isinstance(obj, str):
+            return f"应是str类型，而不是{type(obj)}"
+        if obj not in self.enum:
+            return f"应为{self.enum}中的某一个值"
+        return ""
+
 
 STANDARD_INPUTBOX = {
     int: IntInputer(),
@@ -1094,6 +1112,11 @@ VALID_TASK = ValidTask() \
           TaskParam(**huodong_entrance_ind_kwargs)]) \
     .add("hd11", "huodong_read_xinlai", "获取活动信赖奖励", "获取活动信赖奖励",
          [TaskParam(**huodong_code_kwargs),
+          TaskParam(**huodong_entrance_ind_kwargs)]) \
+    .add("hd99", "huodong_daily_rt", "活动每日全包", "活动每日H+VH+刷图奖励全获取[04+06+09]",
+         [TaskParam("tu_order", list, "图号", "只包含1~5的列表，表示活动困难图图号，每个均刷3次。",
+                    inputbox=ListInputer(convert=lambda x: int(x), desc="一行一个1~5的整数")),
+          TaskParam(**huodong_code_kwargs),
           TaskParam(**huodong_entrance_ind_kwargs)])
 
 customtask_addr = "customtask"

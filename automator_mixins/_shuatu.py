@@ -1758,6 +1758,16 @@ class ShuatuMixin(ShuatuBaseMixin):
         out = MAP.shua_hard(tu_order)
         self.lock_home()
 
+    def dahaohuodong_hard_noreturn(self, act_map: HuodongMapBase, tu_order=[], code="current", entrance_ind="auto", var=None):
+        """
+        大号刷活动Hard图，要求已经手动通过关。不返回主页。
+        tu_order: list of [1,2,3,4,5]
+        code: 见scenes/huodng/huodong_manager.py
+        entrance_ind：在冒险界面进入活动，设置为"auto"时，自动寻找剧情活动按钮；设置为int时，固定为从右往左数第几个按钮
+        """
+        self.log.write_log("info", f"开始刷活动Hard：{act_map.NAME} - {tu_order}")
+        out = act_map.shua_hard(tu_order)
+
     def dahaohuodong_VHBoss(self, team_order="none", code="current", entrance_ind="auto", var=None):
         """
         大号打VHBoss，team_order见shuatu_daily_ocr。
@@ -1766,6 +1776,30 @@ class ShuatuMixin(ShuatuBaseMixin):
         """
         self.shua_hd_boss(team_order=team_order, code=code, entrance_ind=entrance_ind, once=True, boss_type="VH",
                           var=var, )
+    
+    def huodong_daily_rt(self, tu_order=[], team_order="none", code="current", entrance_ind="auto", var=None):
+        """
+        大号活动每日H+VH+刷图奖励全获取[04+06+09]，team_order见shuatu_daily_ocr。要求已经手动通过关，体力充足。
+        tu_order: list of [1,2,3,4,5]
+        code: 见scenes/huodng/huodong_manager.py
+        entrance_ind：在冒险界面进入活动，设置为"auto"时，自动寻找剧情活动按钮；设置为int时，固定为从右往左数第几个按钮
+        """
+
+        # 打活动VH BOSS
+        self.tui_huodong_daily_routine(tu_order=tu_order, code=code, entrance_ind=entrance_ind, var=None)
+        # self.shua_hd_boss(team_order=team_order, code=code, entrance_ind=entrance_ind, once=True, boss_type="VH",
+        #                   var=var, )
+
+        # # List不为空刷H图
+        # if(tu_order.count != 0):
+        #     self.dahaohuodong_hard_noreturn(tu_order=tu_order, code=code, entrance_ind=entrance_ind, var=None)
+
+        # # 领任务
+        # self.huodong_getbonus(code=code, entrance_ind=entrance_ind, var=None)
+
+
+        
+
         # self.lock_home()
         # MAP = self.get_zhuye().goto_maoxian().goto_huodong(code, entrance_ind)
         # if MAP is False:
@@ -1837,6 +1871,39 @@ class ShuatuMixin(ShuatuBaseMixin):
         act_map.goto_hd_menu()
         self.log.write_log("info", f"开始刷活动Boss,难度{boss_type}")
         act_map.shua_hd_boss(team_order=team_order, once=once, boss_type=boss_type)
+        self.lock_home()
+
+    def tui_huodong_daily_routine(self, tu_order=[], team_order="none", code="current", entrance_ind="auto", var=None):
+        
+        self.lock_home()
+
+        # List of str -> List of int
+        # 到活动页
+        act_map = self.get_zhuye().goto_maoxian().goto_huodong(code, entrance_ind)
+        if act_map is False:
+            self.log.write_log("warning", "无法找到活动入口，请确认是否活动期间")
+            self.lock_home()
+            return
+
+        # 刷H图
+        # # List不为空刷H图
+        if((tu_order.count != 0) and self.check_shuatu()):
+            tu_order = [int(s) for s in tu_order]
+            self.dahaohuodong_hard_noreturn(act_map, tu_order=tu_order, code=code, entrance_ind=entrance_ind, var=None)
+
+        # 打活动VH BOSS
+
+        act_map.goto_hd_menu()
+
+        self.log.write_log("info", f"尝试开始刷活动Boss,难度VH")
+        act_map.shua_hd_boss(team_order=team_order, once=True, boss_type="VH")
+
+        # 刷VH结束
+        self.log.write_log("info", f"刷活动Boss结束,开始领奖")
+        # 领奖励
+        act_map.huodong_getbonus()
+        # 警告
+        self.log.write_log("info", f"完成领奖，回家")
         self.lock_home()
 
     def tui_hd_map(self, diff="N", team_order="none", code="current", entrance_ind="auto", get_zhiyuan=False,

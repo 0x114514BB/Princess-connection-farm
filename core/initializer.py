@@ -929,6 +929,7 @@ class PCRInitializer:
             threading.Thread(target=PCRInitializer._listener, args=(self,), daemon=True).start()
         while self.listening == 0:
             pass
+        ## 这里分配
         for d in self.devices.devices.values():
             if not d._in_process:
                 d._in_process = True
