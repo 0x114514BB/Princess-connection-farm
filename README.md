@@ -1,6 +1,6 @@
  <img src="webclient/src/assets/logo.jpg" width = "80%" height = "80%" alt="LOGO" align=center />
 
-# Princess connection 公主连结农场脚本v2.8.20230223.1
+# Princess connection 公主连结农场脚本v2.8.20230308.1
 
 ![](https://img.shields.io/badge/license-GPL--3.0-blue)![](https://img.shields.io/badge/opencv-2.0-blue)![](https://img.shields.io/badge/UIAutomator-2-blue)
 
@@ -299,6 +299,18 @@ Tips:QQPush机器人经常换号 ~~Wechat在4月底将全部弃用，转Wework~~
 
 <details>
 <summary>更新日志（点击展开）</summary>
+
+2023/03/08 By UVJkiNTQ, TheAutumnOfRice
+
+- 惯例更新
+  - 活动`星光公主 Re:M@ster 复刻`
+
+- 杂项 完善了活动图相关的任务提示语。
+
+2023/03/05 By UVJkiNTQ
+
+- BUG修复
+  - 修复活动回到菜单卡剧情的问题
 
 2023/02/23 By UVJkiNTQ, TheAutumnOfRice
 
