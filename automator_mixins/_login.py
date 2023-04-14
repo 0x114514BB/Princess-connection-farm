@@ -292,6 +292,9 @@ class LoginMixin(ToolsMixin):
                 # 单独控件检测应该放在最后
                 elif self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").exists():
                     # time.sleep(0.8)
+                    if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_phone_terms").exists():
+                        if not self.is_exists(START_UI["gouxuan"]):
+                            self.lock_img(START_UI["gouxuan"], elseclick=(293, 424), elsedelay=1, retry=2)
                     self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").click(timeout=5)
                     # time.sleep(captcha_sleep_times)
                     return -1
@@ -543,6 +546,9 @@ class LoginMixin(ToolsMixin):
                     self.log.write_log("info", "测试点003")
                     continue
                 if self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").exists():
+                    if self.d(resourceId="com.bilibili.priconne:id/tv_gsc_phone_terms").exists():
+                        if not self.is_exists(START_UI["gouxuan"]):
+                            self.lock_img(START_UI["gouxuan"], elseclick=(293, 424), elsedelay=1, retry=2)
                     self.d(resourceId="com.bilibili.priconne:id/iv_gsc_account_login").click()
                     self.log.write_log("info", "测试点004")
                     time.sleep(2)
